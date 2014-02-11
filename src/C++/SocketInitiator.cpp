@@ -133,16 +133,17 @@ void SocketInitiator::doConnect( const SessionID& s, const Dictionary& d )
   try
   {
     std::string address;
+    std::string bind("0.0.0.0");
     short port = 0;
     Session* session = Session::lookupSession( s );
     if( !session->isSessionTime(UtcTimeStamp()) ) return;
 
     Log* log = session->getLog();
 
-    getHost( s, d, address, port );
+    getHost( s, d, address, port, bind );
 
-    log->onEvent( "Connecting to " + address + " on port " + IntConvertor::convert((unsigned short)port) );
-    int result = m_connector.connect( address, port, m_noDelay, m_sendBufSize, m_rcvBufSize );
+    log->onEvent( "Connecting to " + address + " on port " + IntConvertor::convert((unsigned short)port)  + " (bind to " + bind + ")");
+    int result = m_connector.connect( address, port, m_noDelay, m_sendBufSize, m_rcvBufSize, "" );
     setPending( s );
 
     m_pendingConnections[ result ] 
@@ -229,7 +230,7 @@ void SocketInitiator::onTimeout( SocketConnector& )
 }
 
 void SocketInitiator::getHost( const SessionID& s, const Dictionary& d,
-                               std::string& address, short& port )
+                               std::string& address, short& port, std::string & bind )
 {
   int num = 0;
   SessionToHostNum::iterator i = m_sessionToHostNum.find( s );
@@ -253,6 +254,14 @@ void SocketInitiator::getHost( const SessionID& s, const Dictionary& d,
     num = 0;
     address = d.getString( SOCKET_CONNECT_HOST );
     port = ( short ) d.getLong( SOCKET_CONNECT_PORT );
+  }
+  
+  std::stringstream bindStream;
+  bindStream << SOCKET_LOCAL_HOST << num;
+  std::string bindString = bindStream.str();
+  if( d.has(bindString))
+  {
+    bind = d.getString(bindString);
   }
 
   m_sessionToHostNum[ s ] = ++num;

@@ -82,9 +82,8 @@ private:
 SocketConnector::SocketConnector( int timeout )
 : m_monitor( timeout ) {}
 
-int SocketConnector::connect( const std::string& address, int port, bool noDelay,
-                              int sendBufSize, int rcvBufSize )
-{
+int SocketConnector::connect( const std::string& address, int port, bool noDelay, int sendBufSize, int rcvBufSize, const std::string & bindip )
+{ 
   int socket = socket_createConnector();
 
   if ( socket != -1 )
@@ -96,15 +95,32 @@ int SocketConnector::connect( const std::string& address, int port, bool noDelay
     if( rcvBufSize )
       socket_setsockopt( socket, SO_RCVBUF, rcvBufSize );
     m_monitor.addConnect( socket );
+    if (!bindip.empty())
+    {
+      in_addr_t ip = inet_addr(bindip.c_str());
+      sockaddr_in addr;
+      memset(&addr, 0, sizeof(address));
+      addr.sin_family = PF_INET;
+      addr.sin_addr.s_addr = ip;
+      socklen_t socklen = sizeof( addr );
+      int result = bind( socket, reinterpret_cast < sockaddr* > ( &addr ),
+                        socklen );
+      if (result != 0)
+      {
+        close(socket);
+        return -1;
+      }
+    }
     socket_connect( socket, address.c_str(), port );
   }
   return socket;
 }
 
 int SocketConnector::connect( const std::string& address, int port, bool noDelay, 
-                              int sendBufSize, int rcvBufSize, Strategy& strategy )
-{
-  int socket = connect( address, port, noDelay, sendBufSize, rcvBufSize );
+                              int sendBufSize, int rcvBufSize, std::string const & bind, Strategy& strategy )
+{ 
+
+  int socket = connect( address, port, noDelay, sendBufSize, rcvBufSize, bind );
   return socket;
 }
 

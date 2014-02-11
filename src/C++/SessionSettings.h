@@ -62,6 +62,7 @@ const char HEARTBTINT[] = "HeartBtInt";
 const char SOCKET_ACCEPT_PORT[] = "SocketAcceptPort";
 const char SOCKET_REUSE_ADDRESS[] = "SocketReuseAddress";
 const char SOCKET_CONNECT_HOST[] = "SocketConnectHost";
+const char SOCKET_LOCAL_HOST[] = "SocketLocalHost";
 const char SOCKET_CONNECT_PORT[] = "SocketConnectPort";
 const char SOCKET_NODELAY[] = "SocketNodelay";
 const char SOCKET_SEND_BUFFER_SIZE[] = "SendBufferSize";
