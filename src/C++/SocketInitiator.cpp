@@ -243,6 +243,19 @@ void SocketInitiator::getHost( const SessionID& s, const Dictionary& d,
   std::stringstream portStream;
   portStream << SOCKET_CONNECT_PORT << num;
   std::string portString = portStream.str();
+  
+  std::stringstream bindStream;
+  bindStream << SOCKET_LOCAL_HOST << num;
+  std::string bindString = bindStream.str();
+
+  if( d.has(bindString))
+  {
+    bind = d.getString(bindString);
+  }
+  else
+  {
+    bind = d.getString(SOCKET_LOCAL_HOST);
+  }
 
   if( d.has(hostString) && d.has(portString) )
   {
@@ -254,14 +267,6 @@ void SocketInitiator::getHost( const SessionID& s, const Dictionary& d,
     num = 0;
     address = d.getString( SOCKET_CONNECT_HOST );
     port = ( short ) d.getLong( SOCKET_CONNECT_PORT );
-  }
-  
-  std::stringstream bindStream;
-  bindStream << SOCKET_LOCAL_HOST << num;
-  std::string bindString = bindStream.str();
-  if( d.has(bindString))
-  {
-    bind = d.getString(bindString);
   }
 
   m_sessionToHostNum[ s ] = ++num;
