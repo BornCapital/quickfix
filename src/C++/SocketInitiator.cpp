@@ -252,7 +252,7 @@ void SocketInitiator::getHost( const SessionID& s, const Dictionary& d,
   {
     bind = d.getString(bindString);
   }
-  else
+  else if (d.has(SOCKET_LOCAL_HOST))
   {
     bind = d.getString(SOCKET_LOCAL_HOST);
   }
