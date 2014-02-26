@@ -133,7 +133,7 @@ void SocketInitiator::doConnect( const SessionID& s, const Dictionary& d )
   try
   {
     std::string address;
-    std::string bind("0.0.0.0");
+    std::string bind;
     short port = 0;
     Session* session = Session::lookupSession( s );
     if( !session->isSessionTime(UtcTimeStamp()) ) return;
@@ -142,7 +142,7 @@ void SocketInitiator::doConnect( const SessionID& s, const Dictionary& d )
 
     getHost( s, d, address, port, bind );
 
-    log->onEvent( "Connecting to " + address + " on port " + IntConvertor::convert((unsigned short)port)  + " (bind to " + bind + ")");
+    log->onEvent( "Connecting to " + address + " on port " + IntConvertor::convert((unsigned short)port)  + " (bind to " + (bind.empty() ? "no bind" : bind) + ")");
     int result = m_connector.connect( address, port, m_noDelay, m_sendBufSize, m_rcvBufSize, bind );
     setPending( s );
 
