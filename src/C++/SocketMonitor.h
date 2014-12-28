@@ -40,6 +40,7 @@ typedef int socklen_t;
 #include <set>
 #include <queue>
 #include <time.h>
+#include <string>
 
 namespace FIX
 {
@@ -101,6 +102,10 @@ public:
     virtual void onEvent( SocketMonitor&, int socket ) = 0;
     virtual void onWrite( SocketMonitor&, int socket ) = 0;
     virtual void onError( SocketMonitor&, int socket ) = 0;
+    virtual void onError( SocketMonitor& sm, int s, std::string const & ) 
+    {
+      onError(sm, s);
+    }
     virtual void onError( SocketMonitor& ) = 0;
     virtual void onTimeout( SocketMonitor& )
   {}}

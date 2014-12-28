@@ -141,6 +141,11 @@ int socket_connect( int socket, const char* address, int port )
   int result = connect( socket, reinterpret_cast < sockaddr* > ( &addr ),
                         sizeof( addr ) );
 
+  if (result == -1 && errno == EINPROGRESS)
+  {
+    return 0;
+  }
+
   return result;
 }
 

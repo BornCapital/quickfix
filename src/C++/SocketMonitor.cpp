@@ -288,9 +288,27 @@ void SocketMonitor::processWriteSet( Strategy& strategy, fd_set& writeSet )
     int s = *i;
     if ( !FD_ISSET( *i, &writeSet ) )
       continue;
+    // This only works on linux really
+    int m=0;
+    socklen_t t=sizeof(s);
+    int ret = getsockopt(s,SOL_SOCKET,SO_ERROR,&m,&t);
     m_connectSockets.erase( s );
-    m_readSockets.insert( s );
-    strategy.onConnect( *this, s );
+    if (ret == 0 && m == 0)
+    {
+      m_readSockets.insert( s );
+      strategy.onConnect( *this, s );
+    }
+    else
+    {
+      if (ret != 0)
+      {
+        strategy.onError( *this, s, strerror(ret) );
+      }
+      else
+      {
+        strategy.onError( *this, s, strerror(m) );
+      }
+    }
   }
 
   sockets = m_writeSockets;

@@ -58,6 +58,10 @@ public:
     virtual void onWrite( SocketConnector&, int socket ) = 0;
     virtual bool onData( SocketConnector&, int socket ) = 0;
     virtual void onDisconnect( SocketConnector&, int socket ) = 0;
+    virtual void onDisconnect( SocketConnector& sc, int socket, std::string const & )
+    {
+      onDisconnect(sc, socket);
+    }
     virtual void onError( SocketConnector& ) = 0;
     virtual void onTimeout( SocketConnector& ) {};
   };

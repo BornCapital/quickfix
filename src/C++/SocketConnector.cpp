@@ -59,6 +59,11 @@ private:
     if( !m_strategy.onData( m_connector, socket ) )
       m_strategy.onDisconnect( m_connector, socket );
   }
+  
+  void onError( SocketMonitor&, int socket, std::string const & error )
+  {
+    m_strategy.onDisconnect( m_connector, socket, error );
+  }
 
   void onError( SocketMonitor&, int socket )
   {
@@ -111,7 +116,11 @@ int SocketConnector::connect( const std::string& address, int port, bool noDelay
         return -1;
       }
     }
-    socket_connect( socket, address.c_str(), port );
+    if (socket_connect( socket, address.c_str(), port ) != 0)
+    {
+      close(socket);
+      return -1;
+    }
   }
   return socket;
 }

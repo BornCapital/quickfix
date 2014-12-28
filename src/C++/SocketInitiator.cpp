@@ -144,6 +144,11 @@ void SocketInitiator::doConnect( const SessionID& s, const Dictionary& d )
 
     log->onEvent( "Connecting to " + address + " on port " + IntConvertor::convert((unsigned short)port)  + " (bind to " + (bind.empty() ? "no bind" : bind) + ")");
     int result = m_connector.connect( address, port, m_noDelay, m_sendBufSize, m_rcvBufSize, bind );
+    if (result == -1)
+    {
+      log->onEvent( std::string("Connection failed ") + strerror(errno));
+      return;
+    }
     setPending( s );
 
     m_pendingConnections[ result ] 
@@ -181,7 +186,12 @@ bool SocketInitiator::onData( SocketConnector& connector, int s )
   return pSocketConnection->read( connector );
 }
 
-void SocketInitiator::onDisconnect( SocketConnector&, int s )
+void SocketInitiator::onDisconnect( SocketConnector& sc, int s )
+{
+  onDisconnect(sc, s, "");
+}
+
+void SocketInitiator::onDisconnect( SocketConnector&, int s, std::string const & error )
 {
   SocketConnections::iterator i = m_connections.find( s );
   SocketConnections::iterator j = m_pendingConnections.find( s );
@@ -193,12 +203,18 @@ void SocketInitiator::onDisconnect( SocketConnector&, int s )
 	  pSocketConnection = j->second;
   if( !pSocketConnection )
 	  return;
+ 
 
   setDisconnected( pSocketConnection->getSession()->getSessionID() );
 
   Session* pSession = pSocketConnection->getSession();
   if ( pSession )
   {
+    if (!error.empty())
+    { 
+      Log* log = pSession->getLog();
+      log->onEvent( std::string("Connection failed ") + error);
+    }
     pSession->disconnect();
     setDisconnected( pSession->getSessionID() );
   }

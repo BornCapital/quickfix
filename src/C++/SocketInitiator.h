@@ -59,6 +59,7 @@ private:
   void onWrite( SocketConnector&, int );
   bool onData( SocketConnector&, int );
   void onDisconnect( SocketConnector&, int );
+  void onDisconnect( SocketConnector&, int, std::string const & );
   void onError( SocketConnector& );
   void onTimeout( SocketConnector& );
 
