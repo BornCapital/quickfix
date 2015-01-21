@@ -308,6 +308,7 @@ void SocketMonitor::processWriteSet( Strategy& strategy, fd_set& writeSet )
       {
         strategy.onError( *this, s, strerror(m) );
       }
+      socket_close(s);
     }
   }
 
